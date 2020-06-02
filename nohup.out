@@ -1,0 +1,26 @@
+2020-06-02 07:50:38.257077: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2020-06-02 07:50:39.010057: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libnvinfer.so.6
+2020-06-02 07:50:39.011717: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libnvinfer_plugin.so.6
+Traceback (most recent call last):
+  File "noun_to_adj_gen.py", line 40, in <module>
+    bertmodel = BertForMaskedLM.from_pretrained('bert-large-uncased')
+  File "/opt/conda/lib/python3.7/site-packages/pytorch_pretrained_bert/modeling.py", line 590, in from_pretrained
+    archive.extractall(tempdir)
+  File "/opt/conda/lib/python3.7/tarfile.py", line 2002, in extractall
+    numeric_owner=numeric_owner)
+  File "/opt/conda/lib/python3.7/tarfile.py", line 2044, in extract
+    numeric_owner=numeric_owner)
+  File "/opt/conda/lib/python3.7/tarfile.py", line 2114, in _extract_member
+    self.makefile(tarinfo, targetpath)
+  File "/opt/conda/lib/python3.7/tarfile.py", line 2163, in makefile
+    copyfileobj(source, target, tarinfo.size, ReadError, bufsize)
+  File "/opt/conda/lib/python3.7/tarfile.py", line 247, in copyfileobj
+    buf = src.read(bufsize)
+  File "/opt/conda/lib/python3.7/gzip.py", line 276, in read
+    return self._buffer.read(size)
+  File "/opt/conda/lib/python3.7/_compression.py", line 68, in readinto
+    data = self.read(len(byte_view))
+KeyboardInterrupt
+2020-06-02 07:51:56.397051: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
+2020-06-02 07:51:57.141215: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libnvinfer.so.6
+2020-06-02 07:51:57.142845: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libnvinfer_plugin.so.6
