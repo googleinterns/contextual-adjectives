@@ -25,7 +25,7 @@ noun_to_adj = {}
 for noun in noun_list:
 	noun_to_adj[noun] = []
 sentences = []
-with open("/dataset/all.txt","r") as f:
+with open("all.txt","r") as f:
 	sentences = f.readlines()
 for i in range(len(sentences)):
 	sentences[i] = sentences[i].split("\n")[0]  
