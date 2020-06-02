@@ -86,9 +86,9 @@ for sent in sentences:
 	tokens = tokenizer.tokenize(sent)
 	pos_inf = nltk.tag.pos_tag(tokens)
 	for idx in range(len(pos_inf)):
-    	word, tag = pos_inf[idx]
-    	word = word.lower()
-    	if tag in noun_tags:
+		word, tag = pos_inf[idx]
+		word = word.lower()
+		if tag in noun_tags:
 			if word in noun_list:
 				if idx!=0:
 					word1, tag1 = pos_inf[idx-1]
