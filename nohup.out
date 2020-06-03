@@ -24,3 +24,7 @@ KeyboardInterrupt
 2020-06-02 07:51:56.397051: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.1
 2020-06-02 07:51:57.141215: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libnvinfer.so.6
 2020-06-02 07:51:57.142845: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libnvinfer_plugin.so.6
+Traceback (most recent call last):
+  File "filter_by_idf.py", line 19, in <module>
+    pickle.dump(adj_idf, f)
+NameError: name 'pickle' is not defined
