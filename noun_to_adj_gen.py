@@ -25,7 +25,7 @@ noun_to_adj = {}
 for noun in noun_list:
 	noun_to_adj[noun] = []
 sentences = []
-with open("all.txt","r") as f:
+with open("all.txt","r") as f: #add this to readme file, make a new util file for this
 	sentences = f.readlines()
 for i in range(len(sentences)):
 	sentences[i] = sentences[i].split("\n")[0]  
@@ -81,6 +81,7 @@ adj_tags = ['JJ','JJR','JJS']
 noun_tags = ['NN','NNS','NNP','NNPS']
 adj_set = set(adj_list)
 noun_set = set(noun_list)
+count = 0
 for sent in sentences:
     #POS tagging the sentence
 	tokens = tokenizer.tokenize(sent)
@@ -99,6 +100,7 @@ for sent in sentences:
 						new_words = list(token_score.keys())
 						intersection = list(set(new_words) & adj_set)
 						intersection = [(a, token_score[a]) for a in intersection]
+						count += len(intersection)
 						noun_to_adj[word].extend(intersection)
 						if word1 in adj_list:
 							tagFlag = tag[:2]
@@ -107,6 +109,7 @@ for sent in sentences:
 							for n_word in new_words:
 								if n_word in noun_list:
 									noun_to_adj[n_word].append((word1, token_score[n_word]))
+									count += 1 	
 				if idx!=(len(pos_inf)-1):
 					word1, tag1 = pos_inf[idx+1]
 					word1 = word1.lower()
@@ -117,6 +120,7 @@ for sent in sentences:
 						intersection = list(set(new_words) & adj_set)
 						intersection = [(a, token_score[a]) for a in intersection]
 						noun_to_adj[word].extend(intersection)
+						count += len(intersection)
 						if word1 in adj_list:
 							tagFlag = tag[:2]
 							token_score = perturbBert(sent, bertmodel, num_of_perturb, idx,tagFlag)
@@ -124,7 +128,8 @@ for sent in sentences:
 							for n_word in new_words:
 								if n_word in noun_list:
 									noun_to_adj[n_word].append((word1, token_score[n_word]))    
-
+									count += 1
 
 with open("noun_to_adj_score.dat", 'wb') as f:
 	pickle.dump(noun_to_adj, f)    
+
