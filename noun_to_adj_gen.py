@@ -129,6 +129,7 @@ for sent in sentences:
 								if n_word in noun_list:
 									noun_to_adj[n_word].append((word1, token_score[n_word]))    
 									count += 1
+	print(count)								
 
 with open("noun_to_adj_score.dat", 'wb') as f:
 	pickle.dump(noun_to_adj, f)    
