@@ -1,131 +1,88 @@
+"""Code to generate noun to adjective dictionary"""
 import nltk
-import numpy as np
-import torch
-from pytorch_pretrained_bert import BertTokenizer, BertModel, BertForMaskedLM
-import string
-from nltk.tokenize.treebank import TreebankWordTokenizer, TreebankWordDetokenizer
-from bert_embedding import BertEmbedding
-import pickle
-from nltk.corpus import wordnet
-import tensorflow as tf
+from nltk.tokenize.treebank import TreebankWordTokenizer
+from bert_setup import Bert
 
-noun_list = []
-for synset in list(wordnet.all_synsets(wordnet.NOUN)):
-	noun = synset.lemmas()[0].name()
-	if noun.isalpha():
-		noun_list.append(noun.lower())
+class NounToAdjGen:
+    """Add adjectives for nouns in dictionary noun_to_adj.
 
-adj_list = []
-for synset in list(wordnet.all_synsets(wordnet.ADJ)):
-	adj_list.append(synset.lemmas()[0].name().lower())
+    Attributes:
+        noun_to_adj : Noun to adjective dictionary.
+        tokenizer : An instance of nltk's tokenizer.
+        bert_model : An instance of class bert.
+        adj_tags : Tags of adjectives in nltk.
+        noun_tags : Tags of nouns in nltk.
+        noun_list : List of nouns that we are working on.
+        adj_list : List of adjectives that we are working on.
+    """
+    def __init__(self, noun_list, adj_list):
+        """Initializing noun to adjective dictionary."""
+        self.noun_to_adj = {}
+        for noun in noun_list:
+            self.noun_to_adj[noun] = []
+        # Use nltk treebank tokenizer
+        self.tokenizer = TreebankWordTokenizer()
+        # Initializing the bert class
+        self.bert_model = Bert()
+        self.adj_tags = ['JJ', 'JJR', 'JJS']
+        self.noun_tags = ['NN', 'NNS', 'NNP', 'NNPS']
+        self.noun_list = noun_list
+        self.adj_list = adj_list
 
-noun_list = list(set(noun_list))
-adj_list = list(set(adj_list))
-noun_to_adj = {}
-for noun in noun_list:
-	noun_to_adj[noun] = []
-sentences = []
-with open("all.txt","r") as f: #add this to readme file, make a new util file for this
-	sentences = f.readlines()
-for i in range(len(sentences)):
-	sentences[i] = sentences[i].split("\n")[0]  
+    def add_to_dic(self, sentences, num_of_perturb):
+        """Add adjectives for nouns by perturbing sentence to noun_to_adj.
 
+        Args:
+        sentences : The list of sentences for which to look up for nouns and adjs.
+        num_of_perturb : Number of perturbations you want to make for a word in a sentence
+        """
+        for sent in sentences:
+            # Tokenizing and POS tagging the sentence
+            pos_inf = nltk.tag.pos_tag(self.tokenizer.tokenize(sent))
+            for idx, (word, tag) in enumerate(pos_inf):
+                word = word.lower()
+                if tag in self.noun_tags and word in self.noun_list:
+                    valid_adj_index = []
+                    if idx != 0:
+                        valid_adj_index.append(idx-1)
+                    if idx != (len(pos_inf)-1):
+                        valid_adj_index.append(idx+1)
+                    for adj_index in valid_adj_index:
+                        word1, tag1 = pos_inf[adj_index]
+                        word1 = word1.lower()
+                        if tag1 in self.adj_tags and word1 in self.adj_list:
+                            self.add_adjectives(sent, num_of_perturb, adj_index, word)
+                            self.add_nouns(sent, num_of_perturb, idx, word1)
+                        elif tag1 in self.adj_tags:
+                            self.add_adjectives(sent, num_of_perturb, adj_index, word)
 
-# Use nltk treebank tokenizer and detokenizer
-tokenizer = TreebankWordTokenizer()
-detokenizer = TreebankWordDetokenizer()
+    def add_adjectives(self, sent, num_of_perturb, adj_index, word):
+        """Ask bert for suggestions for more adjectives and add their intersection
+        with adjectives list to the dictionary.
+        Args:
+        sent : The sentence for which use bert to find more adjectives.
+        num_of_perturb : Number of perturbations you want to make for a word in a sentence
+        adj_index : The index of the word need to be perturbed in the sentence.
+        word : The noun for which we are looking for adjectives
+        """
+        token_score = self.bert_model.perturb_bert(sent, num_of_perturb, adj_index)
+        new_words = list(token_score.keys())
+        intersection = list(set(new_words) & set(self.adj_list))
+        intersection = [(a, token_score[a]) for a in intersection]
+        self.noun_to_adj[word].extend(intersection)
 
-# when we use Bert
-berttokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
-bertmodel = BertForMaskedLM.from_pretrained('bert-large-uncased')
-bertmodel.eval()
-
-
-# Generate a list of similar words suggested by Bert
-def perturbBert(sent, model, num, masked_index, tagFlag):
-	tokens = tokenizer.tokenize(sent)
-	invalidChars = set(string.punctuation)
-
-	# for each idx, use Bert to generate k (i.e., num) candidate tokens
-	original_word = tokens[masked_index]
-	#Getting the base form of the word to check for it's synonyms
-	low_tokens = [x.lower() for x in tokens]        
-	low_tokens[masked_index] = '[MASK]'
-	#Eliminating cases for "'s" as Bert does not work well on these cases.      
-	if original_word=="'s":
-		return {}
-	# try whether all the tokens are in the vocabulary
-	try:
-		indexed_tokens = berttokenizer.convert_tokens_to_ids(low_tokens)
-		tokens_tensor = torch.tensor([indexed_tokens])
-		prediction = model(tokens_tensor)
-
-	except KeyError as error:
-		return {}
-
-	# get the similar words
-	topk_Idx = torch.topk(prediction[0, masked_index], num)[1].tolist()
-	scores = torch.topk(prediction[0, masked_index], num)[0].tolist()
-	topk_tokens = berttokenizer.convert_ids_to_tokens(topk_Idx)
-	# generate similar sentences
-	tokens[masked_index] = original_word
-	token_score = {}
-	for i in range(len(topk_tokens)):
-		token_score[topk_tokens[i]] = scores[i]
-	return token_score
-
-
-#Number of perturbations you want to make for a word in a sentence
-num_of_perturb = 10
-adj_tags = ['JJ','JJR','JJS']
-noun_tags = ['NN','NNS','NNP','NNPS']
-adj_set = set(adj_list)
-noun_set = set(noun_list)
-for sent in sentences:
-    #POS tagging the sentence
-	tokens = tokenizer.tokenize(sent)
-	pos_inf = nltk.tag.pos_tag(tokens)
-	for idx in range(len(pos_inf)):
-		word, tag = pos_inf[idx]
-		word = word.lower()
-		if tag in noun_tags:
-			if word in noun_list:
-				if idx!=0:
-					word1, tag1 = pos_inf[idx-1]
-					word1 = word1.lower()
-					if tag1 in adj_tags:
-						tagFlag = tag1[:2]
-						token_score = perturbBert(sent, bertmodel, num_of_perturb, idx-1,tagFlag)
-						new_words = list(token_score.keys())
-						intersection = list(set(new_words) & adj_set)
-						intersection = [(a, token_score[a]) for a in intersection]
-						noun_to_adj[word].extend(intersection)
-						if word1 in adj_list:
-							tagFlag = tag[:2]
-							token_score = perturbBert(sent, bertmodel, num_of_perturb, idx,tagFlag)
-							new_words = list(token_score.keys())
-							for n_word in new_words:
-								if n_word in noun_list:
-									noun_to_adj[n_word].append((word1, token_score[n_word]))
-				if idx!=(len(pos_inf)-1):
-					word1, tag1 = pos_inf[idx+1]
-					word1 = word1.lower()
-					if tag1 in adj_tags:
-						tagFlag = tag1[:2]
-						token_score = perturbBert(sent, bertmodel, num_of_perturb, idx+1,tagFlag)
-						new_words = list(token_score.keys())
-						intersection = list(set(new_words) & adj_set)
-						intersection = [(a, token_score[a]) for a in intersection]
-						noun_to_adj[word].extend(intersection)
-						if word1 in adj_list:
-							tagFlag = tag[:2]
-							token_score = perturbBert(sent, bertmodel, num_of_perturb, idx,tagFlag)
-							new_words = list(token_score.keys())
-							for n_word in new_words:
-								if n_word in noun_list:
-									noun_to_adj[n_word].append((word1, token_score[n_word]))    
-
-
-with open("noun_to_adj_score.dat", 'wb') as f:
-	pickle.dump(noun_to_adj, f)    
-
+    def add_nouns(self, sent, num_of_perturb, noun_index, word):
+        """Ask bert for suggestions for more nouns and add their intersection with nouns
+        list to the dictionary.
+        Args:
+        sent : The sentence for which use bert to find more adjectives.
+        num_of_perturb : Number of perturbations you want to make for a word in a sentence
+        adj_index : The index of the word need to be perturbed in the sentence.
+        word : The noun for which we are looking for adjectives
+        """
+        token_score = self.bert_model.perturb_bert(sent, num_of_perturb, noun_index)
+        new_words = list(token_score.keys())
+        for n_word in new_words:
+            if n_word in self.noun_list:
+                self.noun_to_adj[n_word].append((word, token_score[n_word]))
+    
