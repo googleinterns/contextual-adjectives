@@ -1,20 +1,20 @@
-from nltk.text import TextCollection, Text
-from nltk.corpus import wordnet
+"""Generate IDF for adjectives"""
 import pickle
-f = open("all.txt", "r")
+from nltk.corpus import wordnet
+from nltk.text import TextCollection, Text
+f = open("generated_files/all.txt", "r")
 lines = f.readlines()
 tokens = []
 for line in lines:
-	line = line.lower()
-	line = line.split("\n")[0].split(" ")
-	tokens.extend(line)
+    line = line.lower()
+    line = line.split("\n")[0].split(" ")
+    tokens.extend(line)
 text = Text(tokens)
 mytexts = TextCollection(text)
-# Print the IDF of a word
 adj_idf = {}
 for synset in list(wordnet.all_synsets(wordnet.ADJ)):
-	adj = synset.lemmas()[0].name().lower()
-	adj_idf[adj] = mytexts.idf(adj)
+    adj = synset.lemmas()[0].name().lower()
+    adj_idf[adj] = mytexts.idf(adj)
 
-with open("adj_idf.dat", 'wb') as f:
-	pickle.dump(adj_idf, f)
+with open("generated_files/adj_idf.dat", 'wb') as f:
+    pickle.dump(adj_idf, f)

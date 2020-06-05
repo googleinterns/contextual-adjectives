@@ -1,7 +1,7 @@
 """Contains class bert for operations related to BERT"""
 from nltk.tokenize.treebank import TreebankWordTokenizer
 import torch
-from pytorch_pretrained_bert import Bert_Tokenizer, BertForMaskedLM
+from pytorch_pretrained_bert import BertTokenizer, BertForMaskedLM
 
 class Bert:
     """Given an index in tokens of sentence, suggest new words with the BERT confidence score.
