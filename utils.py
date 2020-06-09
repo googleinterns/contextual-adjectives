@@ -1,14 +1,14 @@
-"""Some basic functions required by COntextual Adjectives"""
+"""Some basic functions required by Contextual Adjectives"""
 from nltk.corpus import wordnet
 
 def sentence_list_gen(filename):
-    """read lines from a file and make a list of lines.
+    """Read lines from a file and make a list of lines.
 
     Args:
       filename : The address of the file which is being read
 
     Returns:
-      A list of lines in the file.
+      Returns a list of lines in the file.
     """
     sentences = []
     with open(filename, "r") as file: #add this to readme file
@@ -47,41 +47,41 @@ def filter_by_idf(noun_to_adj, adj_idf, threshold, max_adj):
     Returns:
       A Dictionary of noun to adj after filtering in sorted order of BERT score.
     """
-    new_dic = {}
+    noun_to_adj_sort = {}
     for noun in noun_to_adj.keys():
-        temp = {}
+        total_bert_score = {}
         total = {}
         for adj, score in noun_to_adj[noun]:
             try:
-                temp[adj] += score
+                total_bert_score[adj] += score
                 total[adj] += 1
             except KeyError:
-                temp[adj] = score
+                total_bert_score[adj] = score
                 total[adj] = 1
-        final_score = {}
-        for adj, val in temp.items():
-            final_score[adj] = -1*val/total[adj]
+        average_bert_score = {}
+        for adj, val in total_bert_score.items():
+            average_bert_score[adj] = -1*val/total[adj]
         try:
-            sorted_adjs = sorted(final_score.items(), key=lambda kv: (kv[1], kv[0]))[:max_adj]
+            sorted_adjs = sorted(average_bert_score.items(), key=lambda kv: (kv[1], kv[0]))[:max_adj]
         except IndexError:
-            sorted_adjs = sorted(final_score.items(), key=lambda kv: (kv[1], kv[0]))
+            sorted_adjs = sorted(average_bert_score.items(), key=lambda kv: (kv[1], kv[0]))
         sorted_lis = []
         for key, val in sorted_adjs:
             if adj_idf[key] >= threshold:
                 sorted_lis.append((key, -1*val))
-        new_dic[noun] = sorted_lis
-    return new_dic
+        noun_to_adj_sort[noun] = sorted_lis
+    return noun_to_adj_sort
 
 def save_as_csv(filename, noun_to_adj):
     """Save a dictionary noun_to_adj to a given filename as csv."""
     file = open(filename, "w")
     for noun in noun_to_adj.keys():
         if noun_to_adj[noun] != []:
-            sent = noun + "\t"
+            sentence = noun + "\t"
             adjs = noun_to_adj[noun]
             for adj, val in adjs:
-                sent += adj + "(" + str(round(val, 2)) + ")\t"
-            sent = sent[:-1]
-            sent += "\n"
-            file.write(sent)
+                sentence += adj + "(" + str(round(val, 2)) + ")\t"
+            sentence = sentence[:-1]
+            sentence += "\n"
+            file.write(sentence)
     file.close()
