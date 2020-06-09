@@ -29,6 +29,6 @@ noun_to_adj = filter_by_idf(getattr(generator, 'noun_to_adj'), adj_idf, 8.125, 2
 #save_as_csv("generated_files/noun_to_adj_sort.csv", noun_to_adj)
 
 #test
-for noun, adjs in enumerate(noun_to_adj):
+for noun, adjs in noun_to_adj.items():
 	if adjs != []:
 		print(noun, adjs)
