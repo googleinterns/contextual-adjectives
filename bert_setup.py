@@ -13,7 +13,7 @@ class Bert:
     """
     def __init__(self):
         self.tokenizer = TreebankWordTokenizer()
-        self.bert_tokenizer = Bert_Tokenizer.from_pretrained('bert-large-uncased')
+        self.bert_tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
         self.bert_model = BertForMaskedLM.from_pretrained('bert-large-uncased')
         self.bert_model.eval()
 
