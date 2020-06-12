@@ -24,12 +24,13 @@ class NounToAdjGen:
         self.tokenizer = TreebankWordTokenizer()
         # Initializing the bert class
         self.bert_model = Bert()
+        # https://pythonprogramming.net/natural-language-toolkit-nltk-part-speech-tagging/
         self.adj_tags = ['JJ', 'JJR', 'JJS']
         self.noun_tags = ['NN', 'NNS', 'NNP', 'NNPS']
         self.noun_list = noun_list
         self.adj_list = adj_list
 
-    def add_to_dic(self, sentences, num_of_perturb):
+    def add_to_dictionary(self, sentences, num_of_perturb):
         """Add adjectives for nouns by perturbing sentence to noun_to_adj.
 
         Args:
