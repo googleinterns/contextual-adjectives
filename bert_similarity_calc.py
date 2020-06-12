@@ -14,5 +14,5 @@ for i in range(len(adj_list)):
 		calculated_dis[(w1, w2)] = dis
 		calculated_dis[(w2, w1)] = dis	
 
-with open("generated_files/adj_distance.dat", 'wb') as f:
+with open("adj_distance.dat", 'wb') as f:
     pickle.dump(calculated_dis, f)
