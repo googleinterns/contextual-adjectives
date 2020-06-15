@@ -2,12 +2,16 @@
 import pickle
 from utils import sentence_list_gen, noun_list_gen, adjective_list_gen, filter_by_idf, save_as_csv
 from noun_to_adj_gen import NounToAdjGen
+import os
 
+# Folder where generated files are stored
+generated_file = os.path.join(os.getcwd(), '..', 'generated_files/')
 # Generating noun list and adjective list from wordnet
 noun_list = noun_list_gen()
 adj_list = adjective_list_gen()
 
-sentences = sentence_list_gen("generated_files/books_data.txt") # Loading dataset into sentences.
+# Loading dataset into sentences.
+sentences = sentence_list_gen(generated_file + 'books_data.txt')
 
 generator = NounToAdjGen(noun_list, adj_list) # an instance of class noun_to_adj_gen
 
@@ -16,7 +20,7 @@ generator = NounToAdjGen(noun_list, adj_list) # an instance of class noun_to_adj
 generator.add_to_dic(sentences[:100], 10) 
 
 # Get Adjectives IDF values.
-with open("generated_files/adj_idf.dat", 'rb') as f:
+with open(generated_file + 'adj_idf.dat', 'rb') as f:
     adj_idf = pickle.load(f)
 
 # filtering by IDF (threshold = 8.125) , sorting by BERT score and returning top k=20 adjectives.

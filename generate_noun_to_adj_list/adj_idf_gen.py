@@ -2,8 +2,12 @@
 import pickle
 from nltk.corpus import wordnet
 from nltk.text import TextCollection, Text
+import os
 
-f = open("generated_files/all.txt", "r")
+# Folder where generated files are stored
+generated_file = os.path.join(os.getcwd(), '..', 'generated_files/')
+
+f = open(generated_file + 'books_data.txt', "r")
 lines = f.readlines()
 tokens = []
 
@@ -20,5 +24,5 @@ for adjective_set in list(wordnet.all_synsets(wordnet.ADJ)):
     adj = adjective_set.lemmas()[0].name().lower()
     adj_idf[adj] = all_tokens.idf(adj)
 
-with open("generated_files/adj_idf.dat", 'wb') as f:
+with open(generated_file + 'adj_idf.dat', 'wb') as f:
     pickle.dump(adj_idf, f)
