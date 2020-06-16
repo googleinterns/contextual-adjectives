@@ -1,5 +1,4 @@
 """Generate csv file with nouns as first coloumn and other columns correspond to adjectives"""
-
 import pickle
 from utils import save_as_csv, sentiment_calculator
 import os
