@@ -1,3 +1,4 @@
+"""Contains function for calculating BERT similarity"""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -17,12 +18,13 @@ from scipy.spatial.distance import cosine, euclidean
 
 
 class BertSimilarity(object):
-
+	"""Class for calculating similarity between two texts"""
     def __init__(self, bert_model='bert-base-uncased', max_seq_length=50, device='cpu'):
+    	"""Initializing the BERT model"""
         self.bert_model = bert_model
         self.max_seq_length = max_seq_length
 
-        self.device = torch.device("cpu" if device=='cpu' or not torch.cuda.is_available() else "cuda")
+        self.device = torch.device("cpu" if device == 'cpu' or not torch.cuda.is_available() else "cuda")
         n_gpu = torch.cuda.device_count()
 
         self.tokenizer = BertTokenizer.from_pretrained(self.bert_model, do_lower_case=True)
@@ -36,8 +38,9 @@ class BertSimilarity(object):
         self.model.eval()
 
 
-    def get_sim(self, sentences, layer=-1, metric='cosine'):
-        
+    def get_similarity(self, sentences, layer=-1, metric='cosine'):
+        """Returns similarity between sentences
+        """
         assert isinstance(sentences, list)
         for pair in sentences:
             assert len(pair) == 2
@@ -72,9 +75,9 @@ class BertSimilarity(object):
             out_features.append(values.detach().cpu().numpy())
 
         flat_list = [item for sublist in out_features for item in sublist]
-        l1 = [e for i, e in enumerate(flat_list) if i %2 == 0]
-        l2 = [e for i, e in enumerate(flat_list) if i %2 == 1]
-        tuples = list(zip(l1, l2))
+        even_list = [e for i, e in enumerate(flat_list) if i %2 == 0]
+        odd_list = [e for i, e in enumerate(flat_list) if i %2 == 1]
+        tuples = list(zip(even_list, odd_list))
 
         distances = []
         for t in tuples:
@@ -86,6 +89,7 @@ class BertSimilarity(object):
         return distances
 
     def _convert_examples_to_features(self, examples):
+    	"""Generate Embeddings of examples"""
         features = []
         for (ex_index, example) in enumerate(examples):
             tokens_a = self.tokenizer.tokenize(example.text)
@@ -148,7 +152,7 @@ class BertSimilarity(object):
 
 
 class InputExample(object):
-
+	"""Input an example"""
     def __init__(self, unique_id, text):
         self.unique_id = unique_id
         self.text = text

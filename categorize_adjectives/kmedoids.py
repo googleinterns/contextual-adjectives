@@ -13,7 +13,7 @@ from libraries.bert import BertSimilarity
 generated_file = os.path.join(os.getcwd(), '..', 'generated_files/')
 
 # Initializing the BERT Similarity function and also storing calculated distances in array.
-x = BertSimilarity()
+BERT = BertSimilarity()
 dis_array = np.zeros((150, 150)) - 1
 
 def distance(w_1, w_2):
@@ -22,8 +22,8 @@ def distance(w_1, w_2):
     Also stores the distance in dis_array
     """
     if dis_array[w_1, w_2] == -1:
-        dis_array[w_1, w_2] = 1-(x.get_sim([(selected_adj[int(w_1)], selected_adj[int(w_2)])],
-                                           layer=-2)[0])
+        dis_array[w_1, w_2] = 1-(BERT.get_similarity([(selected_adj[int(w_1)], selected_adj[int(w_2)])],
+                                 layer=-2)[0])
         dis_array[w_2, w_1] = dis_array[w_1, w_2]
     return dis_array[w_1, w_2]
 
