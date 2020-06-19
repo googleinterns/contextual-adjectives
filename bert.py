@@ -72,10 +72,10 @@ class BertSimilarity(object):
             out_features.append(values.detach().cpu().numpy())
 
         flat_list = [item for sublist in out_features for item in sublist]
+        return flat_list
         l1 = [e for i, e in enumerate(flat_list) if i %2 == 0]
         l2 = [e for i, e in enumerate(flat_list) if i %2 == 1]
         tuples = list(zip(l1, l2))
-
         distances = []
         for t in tuples:
             if metric == 'euclidean':
