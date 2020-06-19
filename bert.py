@@ -40,6 +40,7 @@ class BertSimilarity(object):
         
         assert isinstance(sentences, list)
         for pair in sentences:
+            print (len(pair))
             assert len(pair) == 1
         examples = self._read_examples(sentences)
 
@@ -134,9 +135,8 @@ class BertSimilarity(object):
         """Read a list of `InputExample`s from an input file."""
         examples = []
         unique_id = 0
-        for a in inp:
+        for a, in inp:
             line_a = a.strip()
-                  
             examples.append(
                 InputExample(unique_id=unique_id, text=line_a))
             unique_id += 1
