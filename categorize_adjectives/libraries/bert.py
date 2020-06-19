@@ -18,9 +18,9 @@ from scipy.spatial.distance import cosine, euclidean
 
 
 class BertSimilarity(object):
-	"""Class for calculating similarity between two texts"""
+    """Class for calculating similarity between two texts"""
     def __init__(self, bert_model='bert-base-uncased', max_seq_length=50, device='cpu'):
-    	"""Initializing the BERT model"""
+        """Initializing the BERT model"""
         self.bert_model = bert_model
         self.max_seq_length = max_seq_length
 
@@ -89,7 +89,7 @@ class BertSimilarity(object):
         return distances
 
     def _convert_examples_to_features(self, examples):
-    	"""Generate Embeddings of examples"""
+        """Generate Embeddings of examples"""
         features = []
         for (ex_index, example) in enumerate(examples):
             tokens_a = self.tokenizer.tokenize(example.text)
@@ -152,7 +152,7 @@ class BertSimilarity(object):
 
 
 class InputExample(object):
-	"""Input an example"""
+    """Input an example"""
     def __init__(self, unique_id, text):
         self.unique_id = unique_id
         self.text = text
