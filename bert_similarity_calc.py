@@ -22,7 +22,7 @@ adj_list = selected_adj
 
 calculated_dis = {}
 x = BertSimilarity()
-print(x.get_sim(["harsh", "indian", "chinese"]))
+print(x.get_sim(["harsh"], layer = -2))
 for i in range(len(adj_list)):
     for j in range(len(adj_list)):
         if j<=i:
