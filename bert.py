@@ -132,17 +132,14 @@ class BertSimilarity(object):
 
     def _read_examples(self, inp):
         """Read a list of `InputExample`s from an input file."""
-        examples = [InputExample(unique_id=0, text=inp.strip())]
-        # unique_id = 0
-        # for a,b in inp:
-        #     line_a = a.strip()
-        #     line_b = b.strip()
+        examples = []
+        unique_id = 0
+        for a in inp:
+            line_a = a.strip()
                   
-        #     examples.append(
-        #         InputExample(unique_id=unique_id, text=line_a))
-        #     unique_id += 1
-        #     examples.append(
-        #         InputExample(unique_id=unique_id, text=line_b))
+            examples.append(
+                InputExample(unique_id=unique_id, text=line_a))
+            unique_id += 1
         return examples
                         
 
