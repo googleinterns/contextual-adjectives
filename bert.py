@@ -40,7 +40,6 @@ class BertSimilarity(object):
         
         assert isinstance(sentences, list)
         for pair in sentences:
-            print (len(pair))
             assert len(pair) == 1
         examples = self._read_examples(sentences)
 
