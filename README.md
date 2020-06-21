@@ -9,6 +9,9 @@ adjectives for noun. (eg. [good adjectves for babies], [adjectives for tatoos]
 etc.). We would like to build a system that can categorize the adjectives for a
 noun as [positive], [negative] and by property [size], [beauty], [speed] etc.
 
+
+
+
 ## Source Code Headers
 
 Every file containing source code must include copyright and license
