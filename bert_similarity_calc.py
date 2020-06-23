@@ -4,7 +4,7 @@ import pickle
 from scipy.spatial.distance import cosine
 adj_list = adjective_list_gen()
 
-with open('noun_to_adj_score.dat', 'wr') as f:
+with open('noun_to_adj_score.dat', 'r') as f:
         noun_to_adj = pickle.load(f)
 
 selected_adj = []
