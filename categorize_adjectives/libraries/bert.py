@@ -39,8 +39,7 @@ class BertSimilarity(object):
 
 
     def get_similarity(self, sentences, layer=-1, metric='cosine'):
-        """Returns similarity between sentences
-        """
+        """Returns similarity between sentences"""
         assert isinstance(sentences, list)
         for pair in sentences:
             assert len(pair) == 2

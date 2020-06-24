@@ -13,30 +13,42 @@ def distance(w_1, w_2):
     """
     Calulates and Returns the BERT contexual distance between w1 and w2
     Also stores the distance in dis_array
+
+    w_1, w_2: index of adjectives in the list of adjectives between which we need to find distance.
+
+    returns distance between two words
     """
     if dis_array[w_1, w_2] == -1:
-        dis_array[w_1, w_2] = 1-(BERT.get_similarity([(selected_adj[int(w_1)], selected_adj[int(w_2)])],
-                                 layer=-2)[0])
+        dis_array[w_1, w_2] = 1-(BERT.get_similarity([(selected_adj[int(w_1)],
+                                                       selected_adj[int(w_2)])], layer=-2)[0])
         dis_array[w_2, w_1] = dis_array[w_1, w_2]
     return dis_array[w_2, w_1]
 
 def get_frequent_adjectives(noun_to_adj, num_adj):
-    """Selecting the most frequent num_adj adjectives"""
-    selected_adj = []
+    """Selecting the most frequent num_adj adjectives from the noun_to_adj dictionary"""
+    selected_adjs = []
     adj_count = {}
     for noun in noun_to_adj.keys():
-        for adj, val in noun_to_adj[noun]:
+        for adj, _ in noun_to_adj[noun]:
             try:
                 adj_count[adj] += -1
             except KeyError:
                 adj_count[adj] = -1
     sorted_adjs = sorted(adj_count.items(), key=lambda kv: (kv[1], kv[0]))[:num_adj]
-    for adj, val in sorted_adjs:
-        selected_adj.append(adj)
-    return selected_adj
+    for adj, _ in sorted_adjs:
+        selected_adjs.append(adj)
+    return selected_adjs
 
 def kmedoids_clustering(num_adj, num_cluster):
-    """Performs kmedoids clustering"""
+    """Performs kmedoids clustering
+
+    Uses pyclustering library.
+
+    num_adj: Number of adjectives being clustered.
+    num_cluster: Number of clusters they need to be clustered to.
+
+    returns clusters list
+    """
     sample = [np.array(f) for f in range(num_adj)]
     initial_medoids = random.sample(range(num_adj), num_cluster)
     metric = distance_metric(type_metric.USER_DEFINED, func=distance)
@@ -46,17 +58,17 @@ def kmedoids_clustering(num_adj, num_cluster):
     clusters = kmedoids_instance.get_clusters()
     return clusters
 
-def save_to_csv(clusters):
+def save_to_csv(clusters, file_name):
     """Save the clusters in a csv file"""
-    f = open(generated_file + "kmedoids_clusters.csv", "w")
+    file = open(file_name, "w")
     for cluster in clusters:
         sentence = ""
         for idx in cluster:
             sentence += selected_adj[idx] + ","
         sentence = sentence[:-1]
         sentence += "\n"
-        f.write(sentence)
-    f.close()
+        file.write(sentence)
+    file.close()
 
 if __name__ == "__main__":
     NUM_ADJ = 150
@@ -70,8 +82,8 @@ if __name__ == "__main__":
     dis_array = np.zeros((150, 150)) - 1
 
     # Fetching the noun to adj dictionary from pickle file
-    with open(generated_file + 'noun_to_adj_score.dat', 'wb') as f:
-        noun_to_adj = pickle.load(f)
-    selected_adj = get_frequent_adjectives(noun_to_adj, NUM_ADJ)
-    clusters = kmedoids_clustering(NUM_ADJ, NUM_CLUSTER)
-    save_to_csv(clusters)
+    with open(generated_file + 'noun_to_adj_score.dat', 'rb') as f:
+        noun_to_adj_dictionary = pickle.load(f)
+    selected_adj = get_frequent_adjectives(noun_to_adj_dictionary, NUM_ADJ)
+    generated_clusters = kmedoids_clustering(NUM_ADJ, NUM_CLUSTER)
+    save_to_csv(generated_clusters, generated_file + "kmedoids_clusters.csv")
