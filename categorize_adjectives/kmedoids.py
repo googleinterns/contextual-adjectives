@@ -7,7 +7,6 @@ import pickle
 import numpy as np
 from pyclustering.cluster.kmedoids import kmedoids
 from pyclustering.utils.metric import distance_metric, type_metric
-from libraries.bert import BertSimilarity
 
 def distance(w_1, w_2):
     """
@@ -18,11 +17,7 @@ def distance(w_1, w_2):
 
     returns distance between two words
     """
-    if dis_array[w_1, w_2] == -1:
-        dis_array[w_1, w_2] = 1-(BERT.get_similarity([(selected_adj[int(w_1)],
-                                                       selected_adj[int(w_2)])], layer=-2)[0])
-        dis_array[w_2, w_1] = dis_array[w_1, w_2]
-    return dis_array[w_2, w_1]
+    return dis_array[w_1, w_2]
 
 def get_frequent_adjectives(noun_to_adj, num_adj):
     """Selecting the most frequent num_adj adjectives from the noun_to_adj dictionary"""
@@ -78,8 +73,8 @@ if __name__ == "__main__":
     generated_file = os.path.join(os.getcwd(), '..', 'generated_files/')
 
     # Initializing the BERT Similarity function and also storing calculated distances in array.
-    BERT = BertSimilarity()
-    dis_array = np.zeros((150, 150)) - 1
+    with open(generated_file + "adj_distance.dat", 'rb') as f:
+        dis_array = pickle.load(f)
 
     # Fetching the noun to adj dictionary from pickle file
     with open(generated_file + 'noun_to_adj_score.dat', 'rb') as f:
