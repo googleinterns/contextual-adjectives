@@ -2,7 +2,7 @@
 import os
 import pickle
 
-def cluster_cluster_distance(cluster_1, cluster_2):
+def compute_cluster_distance(cluster_1, cluster_2):
     """Calculate distance between clusters
 
     It is defined as average over distance between adj1, adj2
@@ -17,9 +17,15 @@ def cluster_cluster_distance(cluster_1, cluster_2):
     average_distance /= (len(cluster_1)*len(cluster_2))
     return average_distance
 
-def minimize_clusters(clusters, min_threshold, max_threshold):
-    """Minimize the number of clusters by combining clusters that are at minimum distance
+def optimize_clusters(clusters, min_threshold, max_threshold):
+    """Optimize the number of clusters by combining clusters that are at minimum distance
+    
+    The method used for threshold here is min(min_threshold + 0.005*(len1*len2 - len1 -len2 + 1)
+    len1 is length of first cluster
+    len2 is length of second cluster
 
+
+    clsuters: initial clusters list
     min_threshold : minimum threshold for combining of clusters
     max_threshold: maximum threshold for combining of clusters
 
@@ -34,7 +40,7 @@ def minimize_clusters(clusters, min_threshold, max_threshold):
             for idx1, cluster2 in enumerate(clusters):
                 if cluster2 == cluster1:
                     continue
-                distance = cluster_cluster_distance(cluster1, cluster2)
+                distance = compute_cluster_distance(cluster1, cluster2)
                 if distance < min_distance:
                     min_distance = distance
                     cluster_idx = idx1
@@ -54,8 +60,8 @@ def minimize_clusters(clusters, min_threshold, max_threshold):
                 break
     return clusters
 
-def save_as_csv(clusters, file_name):
-    """Saves the clusters in hierarchial_clusters.csv file"""
+def save_adj_clusters_csv(clusters, file_name):
+    """Saves the clusters in a csv file"""
     file = open(file_name, "w")
     for cluster in clusters:
         sentence = ""
@@ -79,6 +85,9 @@ if __name__ == "__main__":
         adj_list.append(adj2)
     adj_list = list(set(adj_list))
 
+    # These values were chosen after trying clustering with several thresholds
+    # However, I don't think they are optimal and hence there must exists better
+    # values than these
     MIN_THRESHOLD = 0.05
     MAX_THRESHOLD = 0.15
 
@@ -89,4 +98,4 @@ if __name__ == "__main__":
             initial_clusters.append(single_adj_cluster)
 
     final_clusters = minimize_clusters(initial_clusters, MIN_THRESHOLD, MAX_THRESHOLD)
-    save_as_csv(final_clusters, generated_file + "hierarchial_clusters.csv")
+    save_adj_clusters_csv(final_clusters, generated_file + "hierarchial_clusters.csv")
