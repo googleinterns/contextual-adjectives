@@ -8,7 +8,7 @@ import os
 generated_file = os.path.join(os.getcwd(), '..', 'generated_files/')
 
 # Fetching the noun to adj dictionary from pickle file
-with open(generated_file + 'noun_to_adj_score.dat', 'wb') as f:
+with open(generated_file + 'noun_to_adj_score.dat', 'rb') as f:
     noun_to_adj = pickle.load(f)
 
 # Generating polarity of adjectives for a noun
